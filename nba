@@ -1,0 +1,31 @@
+nba <- NBA_train
+str(nba)
+# juantos juegos necesito para llegar a los playoffs = 42
+table(nba$W,nba$Playoffs)
+#cauntos puntos necesito para alcanzar el número de victorias
+nba$dif <- nba$PTS-nba$oppPTS
+plot(nba$dif,nba$W)
+winsreg <- lm(W~dif,data = nba)
+summary(winsreg)
+#W=41+0,032dif  ->  dif>= (42-41)/0,032  -> 30,67 points diff to win 42 games
+pointsreg <- lm(PTS~X2PA+X3PA+FTA+AST+ORB+DRB+TOV+STL+BLK, data = nba)
+summary(pointsreg)
+#sum esquare errors
+SSE <- sum(pointsreg$residuals^2)
+#root mean squared error
+RMSE <- sqrt(SSE/nrow(nba))
+RMSE
+mean(nba$PTS)
+pointsreg <- lm(PTS~X2PA+X3PA+FTA+AST+ORB+DRB+STL+BLK, data = nba)
+summary(pointsreg)
+pointsreg <- lm(PTS~X2PA+X3PA+FTA+AST+ORB+STL, data = nba)
+summary(pointsreg)
+#predict
+test <- NBA_test
+pointspre <- predict(pointsreg,newdata = test)
+SSE <- sum((pointspre-test$PTS)^2)
+SST <- sum((mean(nba$PTS)-test$PTS)^2)
+R2 <- 1-SSE/SST
+R2
+RMSE <- sqrt(SSE/nrow(test))
+RMSE
