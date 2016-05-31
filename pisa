@@ -1,0 +1,35 @@
+test <- pisa2009test
+train <- pisa2009train
+str(train)
+nrow(train)
+#the average reading test score of males
+tapply(train$readingScore,train$male,mean)
+#missing data
+summary(train)
+#remove observations with any missing value
+train <- na.omit(train)
+test <- na.omit(test)
+#change reference level. Tratamiento para variables cualitativas
+train$raceeth <- relevel(train$raceeth,"White")
+test$raceeth <- relevel(test$raceeth,"White")
+#model
+lmS <- lm(readingScore~.,data = train)
+summary(lmS)
+#sum esquare errors
+SSE <- sum(lmS$residuals^2)
+#root mean squared error
+RMSE <- sqrt(SSE/nrow(train))
+RMSE
+#alternative way
+sqrt(mean(lmS$residuals^2))
+#predicting
+pred <- predict(lmS,newdata = test)
+SSE <- sum((pred-test$readingScore)^2)
+SSE
+SST <- sum((mean(train$readingScore)-test$readingScore)^2)
+R2 <- 1-SSE/SST
+R2
+RMSE <- sqrt(SSE/nrow(test))
+RMSE
+#baseline model
+baseline = mean(train$readingScore)
