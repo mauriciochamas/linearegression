@@ -1,0 +1,33 @@
+flu <- FluTrain
+str(flu)
+summary(flu)
+#highest percentage of ILI-related physician visits?
+flu$Week[which.max(flu$ILI)]
+hist(flu$ILI)
+plot(flu$Queries,log(flu$ILI))
+#regression
+pre <- lm(log(ILI)~Queries,data = flu)
+summary(pre)
+test <- FluTest
+preTest <- exp(predict(pre,newdata = test))
+which(test$Week=="2012-03-11 - 2012-03-17")
+preTest[11]
+(2.2934216-2.187378 )/2.2934216
+SSE <- sum((preTest-test$ILI)^2)
+RMSE <- sqrt(SSE/nrow(test))
+sqrt(mean((preTest-test$ILI)^2))
+#time series
+train <- flu
+library(zoo)
+ILIl2 <- lag(zoo(train$ILI),-2,na.pad = T)
+train$ILIl2 <- coredata(ILIl2)
+train$ILIl2 <- lag(zoo(train$ILI),-2,na.pad = T)
+plot(log(train$ILIl2),log(train$ILI))
+trend2 <- lm(log(ILI)~Queries+log(ILIl2),data = train)
+summary(trend2)
+test$ILIl2 <- lag(zoo(test$ILI),-2,na.pad = T)
+test$ILIl2[2] <- train$ILI[417]
+test$ILIl2[1] <- train$ILI[416]
+pretime<- exp(predict(trend2,newdata = test))
+SSE2 <- sum((pretime-test$ILI)^2)
+RMSE2 <- sqrt(SSE/nrow(test))
