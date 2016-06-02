@@ -1,0 +1,29 @@
+data(state)
+statedata = cbind(data.frame(state.x77), state.abb, state.area, state.center,  state.division, state.name, state.region)
+#data exploration
+str(statedata)
+plot(statedata$x,statedata$y)
+plot(statedata$y,statedata$x)
+tapply(statedata$HS.Grad,statedata$state.region,mean)
+boxplot(statedata$Murder~statedata$state.region)
+out <- subset(statedata,state.region=="Northeast")
+which.max(statedata$Murder)
+??who
+which(statedata$state.region=="Northeast"&statedata$Murder>=10)
+statedata$state.name[32]
+names(statedata)
+#model to predict life expectancy
+reg <- lm(Life.Exp~Population+Income+Illiteracy+Murder+HS.Grad+Frost+Area,data = statedata)
+summary(reg)
+#multicollinearity
+plot(statedata$Life.Exp,statedata$Income)
+plot(statedata$Income,statedata$Life.Exp)
+statedata$state.name[which(statedata$Life.Exp<=70&statedata$Income>=6000)]
+#Refining the Model
+reg2 <- lm(Life.Exp~Population+Murder+HS.Grad+Frost,data = statedata)
+summary(reg2)
+sort(predict(reg2))
+statedata$state.name[which.min(statedata$Life.Exp)]
+statedata$state.name[which.max(statedata$Life.Exp)]
+reg2$residuals
+which.min(abs(reg2$residuals))
