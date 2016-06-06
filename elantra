@@ -1,0 +1,28 @@
+train <- subset(elantra,Year<=2012)
+test <- subset(elantra,Year>2012)
+names(elantra)
+mod <- lm(ElantraSales~Unemployment+CPI_energy+CPI_all+Queries+Month,data = train)
+summary(mod)
+#para darle estacionalidad mensual al modelo
+train$Month2 <- as.factor(train$Month)
+mod2 <- lm(ElantraSales~Unemployment+CPI_energy+CPI_all+Queries+Month2,data = train)
+summary(mod2)
+cor(train[c("Unemployment","Month","Queries","CPI_energy","CPI_all")])
+mod3 <- lm(ElantraSales~Unemployment+CPI_energy+CPI_all+Month2,data = train)
+test$Month2 <- as.factor(test$Month)
+summary(mod3)
+pred <- predict(mod3,newdata = test)
+SSE <- sum((pred-test$ElantraSales)^2)
+SSE
+baseline <- mean(train$ElantraSales)
+baseline
+SST <- sum((mean(train$ElantraSales)-test$ElantraSales)^2)
+R2 <- 1-SSE/SST
+R2
+sort(abs(pred))
+sort(error)
+error <- which.max(abs(pred-test$ElantraSales))
+error
+maxerror <- abs(pred-test$ElantraSales)
+max(abs(pred-test$ElantraSales))
+which.max(abs(pred-test$ElantraSales))
